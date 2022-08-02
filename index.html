@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자바스크립트 연습</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+   integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+   crossorigin=""/>
+   <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+   integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+   crossorigin=""></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Where is the ISS?</h1>
+  <div id="map"></div>
+  <p>latitude: <sapn id="lat"></sapn><br>
+  longitude: <sapn id="lon"></sapn></p>
+  <script>
+    var myIcon = L.icon({
+      iconUrl: 'ISS.png',
+      iconSize: [50, 32],
+      iconAnchor: [25, 16],
+    });
+
+    var map = L.map('map').setView([0, 0], 1);
+    var marker = L.marker([0, 0], {icon: myIcon}).addTo(map);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    getISS()
+    // setInterval(getISS, 2000)
+
+    let first = true 
+    async function getISS(){
+      const response = await fetch('https://api.wheretheiss.at/v1/satellites/25544')
+      const data = await response.json()
+      const { latitude, longitude } = data 
+      marker.setLatLng([latitude, longitude])
+      if(first){
+        map.setView([latitude, longitude], 2)
+        first = false 
+      }
+      
+      document.getElementById('lat').textContent = latitude.toFixed(2)
+      document.getElementById('lon').textContent = longitude.toFixed(2)
+    }
+  </script>
+  <!-- <script src='app.js' type="module"></script> -->
+</body>
+</html>
